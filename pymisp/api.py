@@ -72,6 +72,8 @@ class PyMISP(object):
         if asynch and not ASYNC_OK:
             logger.critical("You turned on Async, but don't have requests_futures installed")
             self.asynch = False
+        if not asynch:
+            self._session = requests.Session()
 
         self.resources_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data')
         if out_type != 'json':
@@ -145,7 +147,7 @@ class PyMISP(object):
         if self.asynch and background_callback is not None:
             s = FuturesSession()
         else:
-            s = requests.Session()
+            s = self._session
         prepped = s.prepare_request(req)
         prepped.headers.update(
             {'Authorization': self.key,
